@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: #repace-azure-msi-name-or-service-account-name
+  namespace: test-1
+  annotations:
+    azure.workload.identity/client-id: #replace-client-id
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workload-identity-postgres
+  namespace: test-1
+  labels:
+    app: workload-identity-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: workload-identity-postgres
+  template:
+    metadata:
+      labels:
+        app: workload-identity-postgres
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: #replace-service-account-name
+      containers:
+      - name: workload-identity-postgres
+        image: kalingaru48/wi-postgres-db-test:test12
+        env:
+        - name: POSTGRES_HOST
+          value: #replace-database-host
+        - name: POSTGRES_DATABASE
+          value: test-db
+        - name: POSTGRES_USER
+          value: #replace-database-user
